@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
-import 'login_screen2.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'splash_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
+
   runApp(const MyApp());
 }
 
@@ -25,11 +29,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Universitas Duta Bangsa',
       themeMode: _themeMode,
       theme: ThemeData(
-        // Menggunakan ColorScheme dengan Brightness.light
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blueGrey,
           brightness: Brightness.light,
@@ -37,14 +41,13 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
       ),
       darkTheme: ThemeData(
-        // Menggunakan ColorScheme dengan Brightness.dark
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blueGrey,
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
       ),
-      home: LoginScreen(onToggleTheme: _toggleTheme),
+      home: SplashScreen(onToggleTheme: _toggleTheme),
     );
   }
 }

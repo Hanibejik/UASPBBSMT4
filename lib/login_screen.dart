@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'profile_screen.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -22,25 +24,78 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  void _processLogin() {
+    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Username dan password tidak boleh kosong',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    final box = GetStorage();
+    box.write('username', _usernameController.text);
+    box.write('password', _passwordController.text);
+
+    Get.offAll(
+      () => MainScreen(
+        username: _usernameController.text,
+        password: _passwordController.text,
+        onToggleTheme: widget.onToggleTheme,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login Screen'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.brightness_6),
-            onPressed: widget.onToggleTheme,
-            tooltip: 'Ganti Tema',
-          ),
-        ],
-      ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              SizedBox(height: 60),
+
+              Container(
+                width: 120,
+                height: 120,
+                margin: EdgeInsets.only(bottom: 20),
+                child: Image.asset(
+                  'assets/images/udb.jpg',
+                  fit: BoxFit.contain,
+                ),
+              ),
+              Text(
+                "UNIVERSITAS DUTA BANGSA",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[800],
+                ),
+              ),
+              Text(
+                "SURAKARTA",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+              SizedBox(height: 40),
+
+              Text(
+                "LOGIN",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              SizedBox(height: 30),
               TextField(
                 controller: _usernameController,
                 decoration: const InputDecoration(
@@ -75,37 +130,19 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 30),
 
               ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => ProfileScreen(
-                            username: _usernameController.text,
-                            password: _passwordController.text,
-                            onToggleTheme: widget.onToggleTheme,
-                          ),
-                    ),
-                  );
-                },
-                child: const Text('Login'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 50),
+                ),
+                onPressed: _processLogin,
+                child: Text("Login"),
               ),
               const SizedBox(height: 16),
 
               OutlinedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => ProfileScreen(
-                            username: _usernameController.text,
-                            password: _passwordController.text,
-                            onToggleTheme: widget.onToggleTheme,
-                          ),
-                    ),
-                  );
-                },
+                style: OutlinedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 50),
+                ),
+                onPressed: _processLogin,
                 child: const Text('Sign Up'),
               ),
             ],

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/login_screen.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:get/get.dart';
 
 class ProfileScreen extends StatelessWidget {
   final String username;
@@ -6,17 +9,17 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onToggleTheme;
 
   const ProfileScreen({
-    super.key,
     required this.username,
     required this.password,
     required this.onToggleTheme,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile Screen'),
+        title: const Text('Profile'),
         actions: [
           IconButton(
             icon: const Icon(Icons.brightness_6),
@@ -29,19 +32,15 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Username: $username',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Password: $password',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 30),
+            Text("Username: $username"),
+            Text("Password: $password"),
             ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Kembali ke Halaman Login'),
+              onPressed: () {
+                final box = GetStorage();
+                box.remove('username');
+                Get.offAll(() => LoginScreen(onToggleTheme: onToggleTheme));
+              },
+              child: const Text('Logout'),
             ),
           ],
         ),

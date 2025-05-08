@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
             Container(
               width: 150,
               height: 150,
-              child: Image.asset('assets/images/udb.jpg', fit: BoxFit.contain),
+              child: Image.asset('assets/images/udb.png', fit: BoxFit.contain),
             ),
             const SizedBox(height: 30),
 

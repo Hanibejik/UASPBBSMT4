@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 120,
                 margin: EdgeInsets.only(bottom: 20),
                 child: Image.asset(
-                  'assets/images/udb.jpg',
+                  'assets/images/udb.png',
                   fit: BoxFit.contain,
                 ),
               ),

@@ -75,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen>
             Container(
               width: 200,
               height: 200,
-              child: Image.asset('assets/images/udb.jpg', fit: BoxFit.cover),
+              child: Image.asset('assets/images/udb.png', fit: BoxFit.cover),
             ),
             SizedBox(height: 10),
             Text(

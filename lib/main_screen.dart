@@ -8,6 +8,7 @@ import 'login_screen.dart';
 import 'profile_screen.dart';
 import 'settings_page.dart';
 import 'home_page.dart';
+import 'message_screen.dart';
 
 class MainScreen extends StatefulWidget {
   final String username;
@@ -33,7 +34,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     super.initState();
     _motionTabBarController = MotionTabBarController(
       initialIndex: 0,
-      length: 3,
+      length: 4,
       vsync: this,
     );
   }
@@ -74,11 +75,18 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         controller: _motionTabBarController,
         initialSelectedTab: "Home",
         useSafeArea: true,
-        labels: const ["Home", "Profile", "Settings"],
-        icons: const [Icons.home, Icons.person, Icons.settings],
+        labels: const ["Home", "Message", "Profile", "Settings"],
+        icons: const [Icons.home, Icons.message, Icons.person, Icons.settings],
 
         badges: [
           null,
+
+          const MotionBadgeWidget(
+            isIndicator: false,
+            color: Colors.red,
+            size: 5,
+            show: true,
+          ),
 
           const MotionBadgeWidget(
             isIndicator: true,
@@ -114,6 +122,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         controller: _motionTabBarController,
         children: <Widget>[
           HomePage(onToggleTheme: widget.onToggleTheme),
+          MessageScreen(onToggleTheme: widget.onToggleTheme),
           ProfileScreen(
             username: widget.username,
             password: widget.password,

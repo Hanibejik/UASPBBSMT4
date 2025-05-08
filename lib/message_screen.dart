@@ -11,7 +11,6 @@ class MessageScreen extends StatefulWidget {
 }
 
 class _MessageScreenState extends State<MessageScreen> {
-  // Daftar pesan dengan nama orang Indonesia
   final List<Map<String, dynamic>> pesan = [
     {
       'nama': 'Bagus',
@@ -90,7 +89,6 @@ class _MessageScreenState extends State<MessageScreen> {
     return Scaffold(
       body: Column(
         children: [
-          // Kolom pencarian
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
@@ -110,7 +108,6 @@ class _MessageScreenState extends State<MessageScreen> {
             ),
           ),
 
-          // Daftar pesan
           Expanded(
             child: ListView.builder(
               itemCount: pesan.length,
@@ -164,7 +161,6 @@ class _MessageScreenState extends State<MessageScreen> {
                     ],
                   ),
                   onTap: () {
-                    // Menangani ketika pesan di tap
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Pesan dari ${pesanItem['nama']}'),
@@ -180,7 +176,6 @@ class _MessageScreenState extends State<MessageScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Menangani pembuatan pesan baru
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Buat pesan baru'),

@@ -22,7 +22,6 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Animasi untuk loading
     _controller = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
@@ -35,12 +34,10 @@ class _SplashScreenState extends State<SplashScreen>
       String? username = box.read('username');
       String? password = box.read('password');
 
-      // Cek apakah user sudah login sebelumnya
       if (username != null &&
           password != null &&
           username.isNotEmpty &&
           password.isNotEmpty) {
-        // Jika sudah login, langsung ke MainScreen
         Get.off(
           () => MainScreen(
             username: username,
@@ -49,7 +46,6 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         );
       } else {
-        // Jika belum login, ke LoginScreen
         Get.off(() => LoginScreen(onToggleTheme: widget.onToggleTheme));
       }
     });

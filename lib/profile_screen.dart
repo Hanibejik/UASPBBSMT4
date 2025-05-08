@@ -22,7 +22,6 @@ class ProfileScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Header dengan foto profil
             Container(
               padding: const EdgeInsets.symmetric(vertical: 30.0),
               color: Theme.of(context).primaryColor.withOpacity(0.1),
@@ -59,7 +58,6 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
 
-            // Informasi profil
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(

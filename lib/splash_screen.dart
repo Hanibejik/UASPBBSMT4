@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/login_screen.dart';
+import 'login_screen.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
 import 'main_screen.dart';
@@ -41,7 +41,6 @@ class _SplashScreenState extends State<SplashScreen>
         Get.off(
           () => MainScreen(
             username: username,
-            password: password,
             onToggleTheme: widget.onToggleTheme,
           ),
         );
@@ -60,10 +59,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          Theme.of(context).brightness == Brightness.dark
-              ? Colors.black
-              : const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Colors.black,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -71,23 +67,34 @@ class _SplashScreenState extends State<SplashScreen>
             Container(
               width: 200,
               height: 200,
-              child: Image.asset('assets/images/udb.png', fit: BoxFit.cover),
+              child: Image.asset(
+                'assets/images/udb.png', // Ganti dengan logo Anda
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.wifi_tethering,
+                    size: 100,
+                    color: Colors.blue,
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              "CAFE & WARNET SOLUTION",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+              ),
             ),
             SizedBox(height: 10),
             Text(
-              "UNIVERSITAS DUTA BANGSA",
+              "Internet dan Cafe Terbaik SeSolo Raya", // Tambahkan tulisan ini
               style: TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
-              ),
-            ),
-            Text(
-              "SURAKARTA",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[400],
               ),
             ),
             SizedBox(height: 20),
@@ -97,9 +104,7 @@ class _SplashScreenState extends State<SplashScreen>
                 width: 40,
                 height: 40,
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).primaryColor,
-                  ),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
                   strokeWidth: 4,
                 ),
               ),
@@ -107,13 +112,7 @@ class _SplashScreenState extends State<SplashScreen>
             SizedBox(height: 15),
             Text(
               "Loading...",
-              style: TextStyle(
-                fontSize: 14,
-                color:
-                    Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white70
-                        : Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
           ],
         ),

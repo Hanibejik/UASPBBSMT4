@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:motion_tab_bar/MotionTabBar.dart';
-import 'package:motion_tab_bar/MotionTabBarController.dart';
-import 'package:motion_tab_bar/MotionBadgeWidget.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'login_screen.dart';
-import 'profile_screen.dart';
-import 'settings_page.dart';
 import 'home_page.dart';
-import 'message_screen.dart';
+import 'booking_page.dart';
+import 'service_page.dart';
+import 'profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   final String username;
-  final String password;
   final VoidCallback onToggleTheme;
 
   const MainScreen({
     Key? key,
     required this.username,
-    required this.password,
     required this.onToggleTheme,
   }) : super(key: key);
 
@@ -26,111 +21,209 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
-  MotionTabBarController? _motionTabBarController;
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
+  late List<Widget> _pages;
+  bool _isWhiteBackground = false;
 
   @override
   void initState() {
     super.initState();
-    _motionTabBarController = MotionTabBarController(
-      initialIndex: 0,
-      length: 4,
-      vsync: this,
-    );
+
+    // Load background preference if previously saved
+    final box = GetStorage();
+    _isWhiteBackground = box.read('isWhiteBackground') ?? false;
+
+    _updatePages();
   }
 
-  @override
-  void dispose() {
-    _motionTabBarController!.dispose();
-    super.dispose();
+  void _updatePages() {
+    _pages = [
+      HomePage(isWhiteBackground: _isWhiteBackground),
+      BookingPage(isWhiteBackground: _isWhiteBackground),
+      ServicesPage(isWhiteBackground: _isWhiteBackground),
+      ProfileScreen(
+        username: widget.username,
+        onToggleTheme: widget.onToggleTheme,
+        isWhiteBackground: _isWhiteBackground,
+      ),
+    ];
+  }
+
+  void _toggleBackground() {
+    setState(() {
+      _isWhiteBackground = !_isWhiteBackground;
+      // Save preference to storage
+      final box = GetStorage();
+      box.write('isWhiteBackground', _isWhiteBackground);
+
+      // Update pages with new background setting
+      _updatePages();
+
+      // Show feedback to user
+      Get.snackbar(
+        'Info',
+        _isWhiteBackground
+            ? 'Background diubah ke putih'
+            : 'Background kembali ke tema default',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.blue,
+        colorText: Colors.white,
+        duration: Duration(seconds: 2),
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    // Mengambil nilai tema dari penyimpanan GetStorage
+    final box = GetStorage();
+    bool isDarkMode = box.read('isDarkMode') ?? true;
+
+    // Override background color if white background is selected
+    Color backgroundColor =
+        _isWhiteBackground
+            ? Colors.white
+            : (isDarkMode ? Colors.black : Colors.white);
+
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: Text("Universitas Duta Bangsa"),
+        backgroundColor: isDarkMode ? Color(0xFF111827) : Colors.blue,
+        title: Text(
+          'Cafe & Warnet Solution',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.brightness_6),
-            onPressed: widget.onToggleTheme,
-            tooltip: 'Ganti Tema',
-          ),
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              final box = GetStorage();
-              box.remove('username');
-              box.remove('password');
-
-              Get.offAll(
-                () => LoginScreen(onToggleTheme: widget.onToggleTheme),
-              );
-            },
-            tooltip: 'Logout',
+            icon: Icon(
+              _isWhiteBackground
+                  ? Icons.invert_colors_off
+                  : Icons.invert_colors,
+              color: Colors.white,
+            ),
+            onPressed: _toggleBackground,
+            tooltip: 'Ganti Background',
           ),
         ],
       ),
-      bottomNavigationBar: MotionTabBar(
-        controller: _motionTabBarController,
-        initialSelectedTab: "Home",
-        useSafeArea: true,
-        labels: const ["Home", "Message", "Profile", "Settings"],
-        icons: const [Icons.home, Icons.message, Icons.person, Icons.settings],
-
-        badges: [
-          null,
-
-          const MotionBadgeWidget(
-            isIndicator: false,
-            color: Colors.red,
-            size: 5,
-            show: true,
+      body: _pages[_currentIndex],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color:
+              _isWhiteBackground
+                  ? Colors.white
+                  : (isDarkMode ? Color(0xFF111827) : Colors.white),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-
-          const MotionBadgeWidget(
-            isIndicator: true,
-            color: Colors.red,
-            size: 5,
-            show: true,
-          ),
-
-          null,
-        ],
-
-        tabSize: 50,
-        tabBarHeight: 55,
-        textStyle: const TextStyle(
-          fontSize: 12,
-          color: Colors.black,
-          fontWeight: FontWeight.w500,
         ),
-        tabIconColor: Colors.blue[600],
-        tabIconSize: 28.0,
-        tabIconSelectedSize: 26.0,
-        tabSelectedColor: Colors.blue[900],
-        tabIconSelectedColor: Colors.white,
-        tabBarColor: Colors.white,
-        onTabItemSelected: (int value) {
-          setState(() {
-            _motionTabBarController!.index = value;
-          });
-        },
-      ),
-      body: TabBarView(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: _motionTabBarController,
-        children: <Widget>[
-          HomePage(onToggleTheme: widget.onToggleTheme),
-          MessageScreen(onToggleTheme: widget.onToggleTheme),
-          ProfileScreen(
-            username: widget.username,
-            password: widget.password,
-            onToggleTheme: widget.onToggleTheme,
+        child: ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
-          SettingsPage(onToggleTheme: widget.onToggleTheme),
-        ],
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            type: BottomNavigationBarType.fixed,
+            backgroundColor:
+                _isWhiteBackground
+                    ? Colors.white
+                    : (isDarkMode ? Color(0xFF111827) : Colors.white),
+            selectedItemColor:
+                _isWhiteBackground
+                    ? Colors.blue
+                    : (isDarkMode ? Colors.blue : Colors.black),
+            unselectedItemColor: Colors.grey,
+            items: [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.calendar_today),
+                label: 'Booking',
+              ),
+              BottomNavigationBarItem(icon: Icon(Icons.apps), label: 'Layanan'),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Profil',
+              ),
+            ],
+          ),
+        ),
       ),
+      floatingActionButton: Container(
+        height: 60,
+        width: 60,
+        child: FloatingActionButton(
+          backgroundColor: Colors.blue,
+          child: Icon(Icons.wifi_tethering, size: 30, color: Colors.white),
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              backgroundColor: Colors.transparent,
+              builder: (BuildContext context) {
+                return Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color:
+                        _isWhiteBackground
+                            ? Colors.white
+                            : (isDarkMode ? Color(0xFF111827) : Colors.white),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Cafe & Warnet Solution',
+                        style: TextStyle(
+                          color:
+                              _isWhiteBackground
+                                  ? Colors.black
+                                  : (isDarkMode ? Colors.white : Colors.black),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'Version 1.0.0',
+                        style: TextStyle(
+                          color:
+                              _isWhiteBackground
+                                  ? Colors.black
+                                  : (isDarkMode ? Colors.grey : Colors.black),
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('Close'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

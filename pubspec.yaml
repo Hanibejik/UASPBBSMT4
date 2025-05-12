@@ -19,7 +19,9 @@ dependencies:
   get_storage: ^2.1.1
   get: ^4.7.2
   motion_tab_bar: ^2.0.4
-
+  zo_animated_border : any
+  flutter_image_slideshow: any
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -29,4 +31,66 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/udb.png
-
+    #kopi
+    - assets/images/kopi/americano.jpg
+    - assets/images/kopi/cafelatte.jpg
+    - assets/images/kopi/cappucino.jpg
+    - assets/images/kopi/cappucinodua.jpg
+    - assets/images/kopi/caramelatte.jpg
+    - assets/images/kopi/esamericano.jpg
+    - assets/images/kopi/escaffelatte.jpg
+    - assets/images/kopi/escappucino.jpg
+    - assets/images/kopi/espresso.jpg
+    #kopisusu
+    - assets/images/kopisusu/kopisusuaren.jpg
+    - assets/images/kopisusu/kopisusucookies.jpg
+    - assets/images/kopisusu/kopisusucookiesdua.jpg
+    - assets/images/kopisusu/kopisusuhazelnut.jpg
+    - assets/images/kopisusu/kopisusuhazelnutdua.jpg
+    - assets/images/kopisusu/Picture16.jpg
+    - assets/images/kopisusu/Picture17.jpg
+    - assets/images/kopisusu/Picture18.jpg
+    - assets/images/kopisusu/Picture19.jpg
+    #maincourse
+    - assets/images/maincourse/Picture42.png
+    - assets/images/maincourse/Picture43.png
+    - assets/images/maincourse/Picture44.jpg
+    - assets/images/maincourse/Picture45.jpg
+    - assets/images/maincourse/Picture46.jpg
+    - assets/images/maincourse/Picture47.jpg
+    - assets/images/maincourse/Picture48.jpg
+    #nonkopi
+    - assets/images/nonkopi/Picture20.jpg
+    - assets/images/nonkopi/Picture21.jpg
+    - assets/images/nonkopi/Picture22.jpg
+    - assets/images/nonkopi/Picture23.jpg
+    - assets/images/nonkopi/Picture24.jpg
+    - assets/images/nonkopi/Picture25.jpg
+    - assets/images/nonkopi/Picture26.png
+    - assets/images/nonkopi/Picture27.png
+    - assets/images/nonkopi/Picture28.png
+    - assets/images/nonkopi/Picture29.jpg
+    - assets/images/nonkopi/Picture30.jpg
+    - assets/images/nonkopi/Picture31.png
+    - assets/images/nonkopi/Picture32.png
+    - assets/images/nonkopi/Picture33.png
+    - assets/images/nonkopi/Picture34.png
+    #snack
+    - assets/images/snack/Picture35.jpg
+    - assets/images/snack/Picture36.jpg
+    - assets/images/snack/Picture37.jpg
+    - assets/images/snack/Picture38.png
+    - assets/images/snack/Picture39.png
+    - assets/images/snack/Picture40.jpg
+    - assets/images/snack/Picture41.png
+    #game
+    - assets/images/game/ayodance.jpg
+    - assets/images/game/cs.jpg
+    - assets/images/game/dota.jpg
+    - assets/images/game/epicgame.jpg
+    - assets/images/game/fn.jpg
+    - assets/images/game/ls.jpg
+    - assets/images/game/pb.jpg
+    - assets/images/game/roblox.jpg
+    - assets/images/game/steam.jpg
+    - assets/images/game/valo.jpg

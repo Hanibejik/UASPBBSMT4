@@ -6,55 +6,34 @@ import 'login_screen.dart';
 class ProfileScreen extends StatelessWidget {
   final String username;
   final VoidCallback onToggleTheme;
-  final bool isWhiteBackground; // Add this parameter
+  final bool isWhiteBackground;
 
   const ProfileScreen({
     Key? key,
     required this.username,
     required this.onToggleTheme,
-    required this.isWhiteBackground, // Include it in the constructor
+    required this.isWhiteBackground,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          isWhiteBackground ? Colors.white : Colors.black, // Use the parameter
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: Text(
-            "Halaman Profil",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        ),
-        actions: [
-          Container(
-            margin: EdgeInsets.only(right: 16),
-            child: Row(
-              children: [
-                Text("4G", style: TextStyle(color: Colors.grey, fontSize: 14)),
-              ],
-            ),
-          ),
-        ],
-      ),
+      backgroundColor: isWhiteBackground ? Colors.white : Colors.black,
+      // Removed appBar completely to eliminate title bar and 4G indicator
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Added SafeArea and some extra padding at the top to compensate for missing AppBar
+              SizedBox(height: MediaQuery.of(context).padding.top),
+
               // Profile Card
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color:
-                      isWhiteBackground
-                          ? Colors.white
-                          : Color(0xFF111827), // Dynamic color
+                  color: isWhiteBackground ? Colors.white : Color(0xFF111827),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 padding: EdgeInsets.all(16),
@@ -98,7 +77,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 4),
                             Text(
-                              "user@example.com", // Modify as needed
+                              "user@example.com",
                               style: TextStyle(
                                 color:
                                     isWhiteBackground
@@ -161,7 +140,7 @@ class ProfileScreen extends StatelessWidget {
                       title: "Balance",
                       value: "Rp 50.000",
                       showDivider: true,
-                      isWhiteBackground: isWhiteBackground, // Pass parameter
+                      isWhiteBackground: isWhiteBackground,
                     ),
 
                     // Transaction History
@@ -171,7 +150,7 @@ class ProfileScreen extends StatelessWidget {
                       title: "Transaction History",
                       hasNavigation: true,
                       showDivider: true,
-                      isWhiteBackground: isWhiteBackground, // Pass parameter
+                      isWhiteBackground: isWhiteBackground,
                     ),
 
                     // Payment Methods
@@ -181,15 +160,17 @@ class ProfileScreen extends StatelessWidget {
                       title: "Payment Methods",
                       hasNavigation: true,
                       showDivider: true,
-                      isWhiteBackground: isWhiteBackground, // Pass parameter
+                      isWhiteBackground: isWhiteBackground,
                     ),
 
-                    // Logout
+                    // Logout - Modified to go directly to login screen
                     GestureDetector(
                       onTap: () {
                         final box = GetStorage();
                         box.remove('username');
                         box.remove('password');
+
+                        // Direct navigation to login screen without splash
                         Get.offAll(
                           () => LoginScreen(onToggleTheme: onToggleTheme),
                         );
@@ -259,7 +240,7 @@ class ProfileScreen extends StatelessWidget {
                       title: "App Notifications",
                       value: true,
                       showDivider: true,
-                      isWhiteBackground: isWhiteBackground, // Pass parameter
+                      isWhiteBackground: isWhiteBackground,
                     ),
 
                     // Promo Notifications
@@ -268,7 +249,7 @@ class ProfileScreen extends StatelessWidget {
                       title: "Promo Notifications",
                       value: true,
                       showDivider: true,
-                      isWhiteBackground: isWhiteBackground, // Pass parameter
+                      isWhiteBackground: isWhiteBackground,
                     ),
 
                     // System Notifications
@@ -276,7 +257,7 @@ class ProfileScreen extends StatelessWidget {
                       icon: Icons.system_update,
                       title: "System Notifications",
                       value: false,
-                      isWhiteBackground: isWhiteBackground, // Pass parameter
+                      isWhiteBackground: isWhiteBackground,
                     ),
                   ],
                 ),
@@ -311,7 +292,7 @@ class ProfileScreen extends StatelessWidget {
                       title: "About Us",
                       hasNavigation: true,
                       showDivider: true,
-                      isWhiteBackground: isWhiteBackground, // Pass parameter
+                      isWhiteBackground: isWhiteBackground,
                     ),
 
                     ProfileMenuItem(
@@ -320,7 +301,7 @@ class ProfileScreen extends StatelessWidget {
                       title: "Help & Support",
                       hasNavigation: true,
                       showDivider: true,
-                      isWhiteBackground: isWhiteBackground, // Pass parameter
+                      isWhiteBackground: isWhiteBackground,
                     ),
 
                     ProfileMenuItem(
@@ -328,7 +309,7 @@ class ProfileScreen extends StatelessWidget {
                       iconColor: Colors.blue,
                       title: "Privacy Policy",
                       hasNavigation: true,
-                      isWhiteBackground: isWhiteBackground, // Pass parameter
+                      isWhiteBackground: isWhiteBackground,
                     ),
                   ],
                 ),
@@ -359,7 +340,7 @@ class ProfileMenuItem extends StatelessWidget {
   final String? value;
   final bool hasNavigation;
   final bool showDivider;
-  final bool isWhiteBackground; // Add this parameter
+  final bool isWhiteBackground;
 
   const ProfileMenuItem({
     Key? key,
@@ -369,7 +350,7 @@ class ProfileMenuItem extends StatelessWidget {
     this.value,
     this.hasNavigation = false,
     this.showDivider = false,
-    required this.isWhiteBackground, // Add this parameter
+    required this.isWhiteBackground,
   }) : super(key: key);
 
   @override
@@ -433,7 +414,7 @@ class ToggleSettingItem extends StatelessWidget {
   final String title;
   final bool value;
   final bool showDivider;
-  final bool isWhiteBackground; // Add this parameter
+  final bool isWhiteBackground;
 
   const ToggleSettingItem({
     Key? key,
@@ -441,7 +422,7 @@ class ToggleSettingItem extends StatelessWidget {
     required this.title,
     required this.value,
     this.showDivider = false,
-    required this.isWhiteBackground, // Add this parameter
+    required this.isWhiteBackground,
   }) : super(key: key);
 
   @override

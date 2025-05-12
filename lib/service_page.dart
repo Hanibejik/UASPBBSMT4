@@ -1,425 +1,276 @@
 import 'package:flutter/material.dart';
+import 'package:zo_animated_border/zo_animated_border.dart';
+import 'game_service.dart';
 
-class ServicesPage extends StatelessWidget {
-  // Tambahkan parameter isWhiteBackground
+class ServicesPage extends StatefulWidget {
   final bool isWhiteBackground;
 
   const ServicesPage({Key? key, this.isWhiteBackground = false})
     : super(key: key);
 
   @override
+  State<ServicesPage> createState() => _ServicesPageState();
+}
+
+class _ServicesPageState extends State<ServicesPage> {
+  void showServiceDetail(String title, String content) {
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            backgroundColor:
+                widget.isWhiteBackground ? Colors.white : Color(0xFF1F2937),
+            title: Text(
+              title,
+              style: TextStyle(
+                color: widget.isWhiteBackground ? Colors.black : Colors.white,
+              ),
+            ),
+            content: Text(
+              content,
+              style: TextStyle(
+                color:
+                    widget.isWhiteBackground ? Colors.black87 : Colors.white70,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text("Tutup", style: TextStyle(color: Colors.blue)),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void showGameMenu() {
+    final List<Map<String, String>> games = [
+      {"nama": "Ayodance", "gambar": "assets/images/game/ayodance.jpg"},
+      {"nama": "Counter Strike 2", "gambar": "assets/images/game/cs.jpg"},
+      {"nama": "Dota 2", "gambar": "assets/images/game/dota.jpg"},
+      {"nama": "Epic Game", "gambar": "assets/images/game/epicgame.jpg"},
+      {"nama": "Steam", "gambar": "assets/images/game/steam.jpg"},
+      {"nama": "Lost Saga Origin", "gambar": "assets/images/game/ls.jpg"},
+      {"nama": "Pointblank", "gambar": "assets/images/game/pb.jpg"},
+      {"nama": "Roblox", "gambar": "assets/images/game/roblox.jpg"},
+      {"nama": "Valorant", "gambar": "assets/images/game/valo.jpg"},
+      {"nama": "Fortnite", "gambar": "assets/images/game/fn.jpg"},
+    ];
+
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            backgroundColor:
+                widget.isWhiteBackground ? Colors.white : Color(0xFF1F2937),
+            title: Text(
+              "Daftar Game",
+              style: TextStyle(
+                color: widget.isWhiteBackground ? Colors.black : Colors.white,
+              ),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  ...games.map(
+                    (game) => ListTile(
+                      leading: Image.asset(
+                        game["gambar"]!,
+                        width: 36,
+                        height: 36,
+                        errorBuilder:
+                            (_, __, ___) =>
+                                Icon(Icons.videogame_asset, color: Colors.grey),
+                      ),
+                      title: Text(
+                        game["nama"]!,
+                        style: TextStyle(
+                          color:
+                              widget.isWhiteBackground
+                                  ? Colors.black87
+                                  : Colors.white70,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color:
+                        widget.isWhiteBackground
+                            ? Colors.black
+                            : Colors.white70,
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.add_circle_outline, color: Colors.blue),
+                    title: Text(
+                      "Tambah Game",
+                      style: TextStyle(
+                        color:
+                            widget.isWhiteBackground
+                                ? Colors.black
+                                : Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      showDialog(
+                        context: context,
+                        builder:
+                            (_) => AlertDialog(
+                              backgroundColor:
+                                  widget.isWhiteBackground
+                                      ? Colors.white
+                                      : Color(0xFF1F2937),
+                              title: Text(
+                                "Tambah Game",
+                                style: TextStyle(
+                                  color:
+                                      widget.isWhiteBackground
+                                          ? Colors.black
+                                          : Colors.white,
+                                ),
+                              ),
+                              content: Text(
+                                "Silakan ke operator warnet untuk menginstall game Anda.",
+                                style: TextStyle(
+                                  color:
+                                      widget.isWhiteBackground
+                                          ? Colors.black87
+                                          : Colors.white70,
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: Text(
+                                    "Tutup",
+                                    style: TextStyle(color: Colors.blue),
+                                  ),
+                                ),
+                              ],
+                            ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text("Tutup", style: TextStyle(color: Colors.blue)),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Widget serviceBox(String title, IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: ZoDottedBorder(
+        animate: true,
+        borderRadius: 10,
+        dashLength: 10,
+        gapLength: 5,
+        strokeWidth: 3,
+        color: Colors.blue,
+        animationDuration: Duration(seconds: 4),
+        borderStyle: BorderStyleType.monochrome,
+        child: Container(
+          width: 150,
+          height: 100,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color:
+                widget.isWhiteBackground
+                    ? Colors.grey.shade100
+                    : Color(0xFF1F2937),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 32,
+                color: widget.isWhiteBackground ? Colors.black : Colors.white,
+              ),
+              SizedBox(height: 6),
+              Text(
+                title,
+                style: TextStyle(
+                  color: widget.isWhiteBackground ? Colors.black : Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Gunakan background berdasarkan properti isWhiteBackground
-      backgroundColor: isWhiteBackground ? Colors.white : Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: Text(
-            "Halaman Layanan",
-            style: TextStyle(
-              // Sesuaikan warna teks berdasarkan background
-              color: isWhiteBackground ? Colors.black : Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        actions: [
-          Container(
-            margin: EdgeInsets.only(right: 16),
-            child: Row(
-              children: [
-                Text("4G", style: TextStyle(color: Colors.grey, fontSize: 14)),
-              ],
-            ),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Services Card
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  // Sesuaikan warna background card berdasarkan tema
-                  color: isWhiteBackground ? Colors.white : Color(0xFF111827),
-                  borderRadius: BorderRadius.circular(16),
-                  // Tambahkan shadow untuk background putih
-                  boxShadow:
-                      isWhiteBackground
-                          ? [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
-                              spreadRadius: 1,
-                              blurRadius: 5,
-                              offset: Offset(0, 2),
-                            ),
-                          ]
-                          : [],
-                ),
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Layanan",
-                      style: TextStyle(
-                        color: isWhiteBackground ? Colors.black : Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      childAspectRatio: 1.2,
-                      crossAxisSpacing: 15,
-                      mainAxisSpacing: 15,
-                      children: [
-                        ServiceTile(
-                          icon: Icons.print,
-                          title: "Print",
-                          isActive: true,
-                          isWhiteBackground: isWhiteBackground,
-                        ),
-                        ServiceTile(
-                          icon: Icons.account_balance_wallet,
-                          title: "Top-Up",
-                          isActive: true,
-                          isWhiteBackground: isWhiteBackground,
-                        ),
-                        ServiceTile(
-                          icon: Icons.scanner,
-                          title: "Scan",
-                          isActive: true,
-                          isWhiteBackground: isWhiteBackground,
-                        ),
-                        ServiceTile(
-                          icon: Icons.fastfood,
-                          title: "Food",
-                          isActive: false,
-                          isWhiteBackground: isWhiteBackground,
-                        ),
-                        ServiceTile(
-                          icon: Icons.wifi,
-                          title: "WiFi",
-                          isActive: true,
-                          isWhiteBackground: isWhiteBackground,
-                        ),
-                        ServiceTile(
-                          icon: Icons.more_horiz,
-                          title: "Lainnya",
-                          isActive: false,
-                          isWhiteBackground: isWhiteBackground,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 20),
-
-              // Recent Services
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: isWhiteBackground ? Colors.white : Color(0xFF111827),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow:
-                      isWhiteBackground
-                          ? [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
-                              spreadRadius: 1,
-                              blurRadius: 5,
-                              offset: Offset(0, 2),
-                            ),
-                          ]
-                          : [],
-                ),
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Layanan Terakhir",
-                      style: TextStyle(
-                        color: isWhiteBackground ? Colors.black : Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 15),
-                    RecentServiceItem(
-                      icon: Icons.print,
-                      title: "Print Dokumen",
-                      subtitle: "10 halaman",
-                      date: "Hari ini, 12:30",
-                      amount: "Rp 5.000",
-                      isWhiteBackground: isWhiteBackground,
-                    ),
-                    Divider(
-                      color:
-                          isWhiteBackground
-                              ? Colors.grey.shade300
-                              : Colors.grey.shade800,
-                    ),
-                    RecentServiceItem(
-                      icon: Icons.wifi,
-                      title: "Paket WiFi",
-                      subtitle: "3 jam",
-                      date: "Hari ini, 10:15",
-                      amount: "Rp 15.000",
-                      isWhiteBackground: isWhiteBackground,
-                    ),
-                    Divider(
-                      color:
-                          isWhiteBackground
-                              ? Colors.grey.shade300
-                              : Colors.grey.shade800,
-                    ),
-                    RecentServiceItem(
-                      icon: Icons.account_balance_wallet,
-                      title: "Top Up Saldo",
-                      subtitle: "Via DANA",
-                      date: "Kemarin, 16:45",
-                      amount: "Rp 50.000",
-                      isWhiteBackground: isWhiteBackground,
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 20),
-
-              // Popular Services
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: isWhiteBackground ? Colors.white : Color(0xFF111827),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow:
-                      isWhiteBackground
-                          ? [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
-                              spreadRadius: 1,
-                              blurRadius: 5,
-                              offset: Offset(0, 2),
-                            ),
-                          ]
-                          : [],
-                ),
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Layanan Populer",
-                      style: TextStyle(
-                        color: isWhiteBackground ? Colors.black : Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 15),
-                    Row(
-                      children: [
-                        PopularServiceButton(
-                          icon: Icons.computer,
-                          label: "Booking PC",
-                          isWhiteBackground: isWhiteBackground,
-                        ),
-                        SizedBox(width: 15),
-                        PopularServiceButton(
-                          icon: Icons.print,
-                          label: "Print Dokumen",
-                          isWhiteBackground: isWhiteBackground,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ServiceTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final bool isActive;
-  final bool isWhiteBackground;
-
-  const ServiceTile({
-    Key? key,
-    required this.icon,
-    required this.title,
-    required this.isActive,
-    this.isWhiteBackground = false,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isWhiteBackground ? Colors.grey.shade100 : Color(0xFF1F2937),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: isActive ? Colors.blue : Colors.grey.withOpacity(0.3),
-              shape: BoxShape.circle,
-            ),
-            child: Center(child: Icon(icon, color: Colors.white, size: 24)),
-          ),
-          SizedBox(height: 8),
-          Text(
-            title,
-            style: TextStyle(
-              color: isWhiteBackground ? Colors.black : Colors.white,
-              fontSize: 14,
-            ),
-          ),
-          if (isActive)
-            Container(
-              margin: EdgeInsets.only(top: 5),
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class RecentServiceItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final String date;
-  final String amount;
-  final bool isWhiteBackground;
-
-  const RecentServiceItem({
-    Key? key,
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.date,
-    required this.amount,
-    this.isWhiteBackground = false,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Center(child: Icon(icon, color: Colors.blue, size: 20)),
-          ),
-          SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: isWhiteBackground ? Colors.black : Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                amount,
-                style: TextStyle(
-                  color: isWhiteBackground ? Colors.black : Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(date, style: TextStyle(color: Colors.grey, fontSize: 12)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class PopularServiceButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isWhiteBackground;
-
-  const PopularServiceButton({
-    Key? key,
-    required this.icon,
-    required this.label,
-    this.isWhiteBackground = false,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          color: isWhiteBackground ? Colors.grey.shade100 : Color(0xFF1F2937),
-          borderRadius: BorderRadius.circular(12),
+      backgroundColor: widget.isWhiteBackground ? Colors.white : Colors.black,
+      body: Padding(
+        padding: EdgeInsets.only(
+          left: 16.0,
+          right: 16.0,
+          top: MediaQuery.of(context).padding.top + 16.0,
+          bottom: 16.0,
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: Colors.blue, size: 28),
-            SizedBox(height: 8),
             Text(
-              label,
+              "Layanan Warnet",
               style: TextStyle(
-                color: isWhiteBackground ? Colors.black : Colors.white,
-                fontSize: 14,
+                color: widget.isWhiteBackground ? Colors.black : Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            SizedBox(height: 20),
+            Expanded(
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  serviceBox("WiFi", Icons.wifi, () {
+                    showServiceDetail(
+                      "WiFi Warnet",
+                      "ID: warnet_wifi\nPassword: 12345678",
+                    );
+                  }),
+                  serviceBox("Layanan Game", Icons.videogame_asset, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (_) => GameServicePage(
+                              isWhiteBackground: widget.isWhiteBackground,
+                            ),
+                      ),
+                    );
+                  }),
+
+                  serviceBox("Charge", Icons.battery_charging_full, () {
+                    showServiceDetail(
+                      "Layanan Charge",
+                      "Harga: Rp 2.000 / jam\nSilakan lakukan transaksi di kasir.",
+                    );
+                  }),
+                  serviceBox("Stream Support", Icons.stream, () {
+                    showServiceDetail(
+                      "Stream Support",
+                      "Fasilitas tambahan:\n- Webcam HD\n- Microphone Eksternal\n- Screen Recorder\nHarga: Rp 8.000 / jam\nSilakan lakukan transaksi di kasir.",
+                    );
+                  }),
+                ],
               ),
             ),
           ],

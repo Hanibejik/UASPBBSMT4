@@ -7,7 +7,14 @@ import 'main_screen.dart';
 class SplashScreen extends StatefulWidget {
   final VoidCallback onToggleTheme;
 
-  const SplashScreen({super.key, required this.onToggleTheme});
+  // Remove isLogout parameter since we'll handle logout differently
+  final int splashDuration;
+
+  const SplashScreen({
+    super.key,
+    required this.onToggleTheme,
+    this.splashDuration = 3,
+  });
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -17,6 +24,7 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
@@ -28,26 +36,33 @@ class _SplashScreenState extends State<SplashScreen>
     )..repeat();
 
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
-    Future.delayed(Duration(seconds: 3), () {
-      final box = GetStorage();
-      String? username = box.read('username');
-      String? password = box.read('password');
-
-      if (username != null &&
-          password != null &&
-          username.isNotEmpty &&
-          password.isNotEmpty) {
-        Get.off(
-          () => MainScreen(
-            username: username,
-            onToggleTheme: widget.onToggleTheme,
-          ),
-        );
-      } else {
-        Get.off(() => LoginScreen(onToggleTheme: widget.onToggleTheme));
-      }
+    // Check credentials and navigate to appropriate screen
+    Future.delayed(Duration(seconds: widget.splashDuration), () {
+      _checkCredentialsAndNavigate();
     });
+  }
+
+  void _checkCredentialsAndNavigate() {
+    final box = GetStorage();
+    String? username = box.read('username');
+    String? password = box.read('password');
+
+    if (username != null &&
+        password != null &&
+        username.isNotEmpty &&
+        password.isNotEmpty) {
+      Get.offAll(
+        () =>
+            MainScreen(username: username, onToggleTheme: widget.onToggleTheme),
+      );
+    } else {
+      Get.offAll(() => LoginScreen(onToggleTheme: widget.onToggleTheme));
+    }
   }
 
   @override
@@ -58,63 +73,132 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Get theme from storage
+    final box = GetStorage();
+    bool isDarkMode = box.read('isDarkMode') ?? true;
+
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 200,
-              height: 200,
-              child: Image.asset(
-                'assets/images/udb.png', // Ganti dengan logo Anda
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(
-                    Icons.wifi_tethering,
-                    size: 100,
-                    color: Colors.blue,
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Logo with animation
+              TweenAnimationBuilder(
+                tween: Tween<double>(begin: 0.6, end: 1.0),
+                duration: Duration(seconds: 1),
+                builder: (context, double value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blue.withOpacity(0.3),
+                            blurRadius: 25,
+                            spreadRadius: 5,
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        'assets/images/udb.png',
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.blue.shade300,
+                                  Colors.blue.shade700,
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.wifi_tethering,
+                              size: 100,
+                              color: Colors.white,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   );
                 },
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              "CAFE & WARNET SOLUTION",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
-              ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              "Internet dan Cafe Terbaik SeSolo Raya", // Tambahkan tulisan ini
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[400],
-              ),
-            ),
-            SizedBox(height: 20),
-            RotationTransition(
-              turns: _animation,
-              child: Container(
-                width: 40,
-                height: 40,
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                  strokeWidth: 4,
+              SizedBox(height: 20),
+              ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return LinearGradient(
+                    colors: [Colors.blue.shade300, Colors.blue.shade700],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ).createShader(bounds);
+                },
+                child: Text(
+                  "CAFE & WARNET SOLUTION",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 15),
-            Text(
-              "Loading...",
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-            ),
-          ],
+              SizedBox(height: 10),
+              Text(
+                "Internet dan Cafe Terbaik SeSolo Raya",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
+                ),
+              ),
+              SizedBox(height: 40),
+              RotationTransition(
+                turns: _animation,
+                child: Container(
+                  width: 45,
+                  height: 45,
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [Colors.blue.shade300, Colors.blue.shade700],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(0.3),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    strokeWidth: 4,
+                  ),
+                ),
+              ),
+              SizedBox(height: 15),
+              Text(
+                "Loading...",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDarkMode ? Colors.grey[500] : Colors.grey[700],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

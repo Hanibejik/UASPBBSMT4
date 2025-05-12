@@ -1,6 +1,43 @@
 import 'package:flutter/material.dart';
-import 'food_beverage_page.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:get/get.dart';
+import 'food_beverage_page.dart';
+
+// Buat class RxList global untuk menyimpan pesanan makanan
+class FoodOrderController extends GetxController {
+  static FoodOrderController get to => Get.find();
+
+  final RxList<Map<String, dynamic>> orderedItems =
+      <Map<String, dynamic>>[].obs;
+
+  // Tambahkan RxList untuk menyimpan riwayat booking
+  final RxList<Map<String, dynamic>> bookingHistory =
+      <Map<String, dynamic>>[].obs;
+
+  void clearOrders() {
+    orderedItems.clear();
+  }
+
+  int get totalFoodPrice => orderedItems.fold(
+    0,
+    (sum, item) => sum + (item['price'] as int) * (item['count'] as int),
+  );
+
+  int get totalItems =>
+      orderedItems.fold(0, (sum, item) => sum + (item['count'] as int));
+
+  void addOrderedItems(List<Map<String, dynamic>> items) {
+    // Filter hanya item yang jumlahnya > 0
+    final selectedItems = items.where((item) => item['count'] > 0).toList();
+    orderedItems.clear();
+    orderedItems.addAll(selectedItems);
+  }
+
+  // Fungsi untuk menambahkan booking ke riwayat
+  void addBookingToHistory(Map<String, dynamic> booking) {
+    bookingHistory.add(booking);
+  }
+}
 
 class BookingPage extends StatefulWidget {
   final bool isWhiteBackground;
@@ -13,25 +50,43 @@ class BookingPage extends StatefulWidget {
 }
 
 class _BookingPageState extends State<BookingPage> {
-  int selectedPC = 10;
-  List<int> availablePCs = [5, 7, 10, 12, 15, 18];
-  String selectedTime = "14:00 — 16:00";
-  List<String> availableTimes = [
-    "10:00 — 12:00",
-    "12:00 — 14:00",
-    "14:00 — 16:00",
-    "16:00 — 18:00",
-    "18:00 — 20:00",
-    "20:00 — 22:00",
-  ];
+  String selectedCategory = 'Reguler';
+  int selectedPC = 1;
+  String selectedDuration = "1 jam";
+  List<String> availableDurations = ["1 jam", "3 jam", "5 jam", "10 jam"];
+
+  // Pastikan FoodOrderController sudah diinisialisasi
+  late final FoodOrderController _foodController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Inisialisasi controller jika belum ada
+    if (!Get.isRegistered<FoodOrderController>()) {
+      Get.put(FoodOrderController());
+    }
+    _foodController = FoodOrderController.to;
+  }
+
+  final Map<String, int> pcCounts = {
+    'Reguler': 30,
+    'VIP': 20,
+    'VVIP': 15,
+    'Battle Arena': 10,
+  };
+
+  final Map<String, int> pcPrices = {
+    'Reguler': 5000,
+    'VIP': 7000,
+    'VVIP': 10000,
+    'Battle Arena': 15000,
+  };
 
   @override
   Widget build(BuildContext context) {
-    // Mengambil status tema gelap/terang dari penyimpanan
     final box = GetStorage();
     bool isDarkMode = box.read('isDarkMode') ?? true;
 
-    // Tentukan warna berdasarkan tema dan pengaturan latar belakang putih
     Color backgroundColor =
         widget.isWhiteBackground
             ? Colors.white
@@ -53,566 +108,387 @@ class _BookingPageState extends State<BookingPage> {
 
     return Scaffold(
       backgroundColor: backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: Text(
-            "Halaman Booking",
-            style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
-          ),
-        ),
-        actions: [
-          Container(
-            margin: EdgeInsets.only(right: 16),
-            child: Row(
-              children: [
-                Text(
-                  "4G",
-                  style: TextStyle(color: greyTextColor, fontSize: 14),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Booking Card
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                  border:
-                      widget.isWhiteBackground
-                          ? Border.all(color: Colors.grey.shade300)
-                          : null,
-                ),
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Booking",
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: MediaQuery.of(context).padding.top + 10),
+            Text(
+              "Pilih Kategori PC",
+              style: TextStyle(
+                color: textColor,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children:
+                  pcCounts.keys.map((category) {
+                    return ChoiceChip(
+                      label: Text(category),
+                      selected: selectedCategory == category,
+                      onSelected:
+                          (_) => setState(() => selectedCategory = category),
+                      selectedColor: Colors.blue,
+                      labelStyle: TextStyle(
+                        color:
+                            selectedCategory == category
+                                ? Colors.white
+                                : textColor,
+                      ),
+                      backgroundColor: secondaryColor,
+                    );
+                  }).toList(),
+            ),
+            SizedBox(height: 20),
+            Text(
+              "Pilih Nomor PC",
+              style: TextStyle(
+                color: textColor,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: List.generate(pcCounts[selectedCategory]!, (index) {
+                int pcNumber = index + 1;
+                return GestureDetector(
+                  onTap: () => setState(() => selectedPC = pcNumber),
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color:
+                          selectedPC == pcNumber ? Colors.blue : secondaryColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "$pcNumber",
+                        style: TextStyle(
+                          color:
+                              selectedPC == pcNumber ? Colors.white : textColor,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                  ),
+                );
+              }),
+            ),
+            SizedBox(height: 20),
+            Text(
+              "Durasi Waktu",
+              style: TextStyle(
+                color: textColor,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              children:
+                  availableDurations.map((duration) {
+                    return ChoiceChip(
+                      label: Text(duration),
+                      selected: selectedDuration == duration,
+                      onSelected:
+                          (_) => setState(() => selectedDuration = duration),
+                      selectedColor: Colors.blue,
+                      labelStyle: TextStyle(
+                        color:
+                            selectedDuration == duration
+                                ? Colors.white
+                                : textColor,
+                      ),
+                      backgroundColor: secondaryColor,
+                    );
+                  }).toList(),
+            ),
+            SizedBox(height: 30),
+            Text(
+              "Makanan & Minuman",
+              style: TextStyle(
+                color: textColor,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            GestureDetector(
+              onTap: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => FoodBeveragePage(
+                          isWhiteBackground: widget.isWhiteBackground,
+                        ),
+                  ),
+                );
+                // Refresh halaman setelah kembali dari FoodBeveragePage
+                setState(() {});
+              },
+              child: Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: secondaryColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Text(
-                      "Pilih PC & Waktu",
-                      style: TextStyle(color: textColor, fontSize: 16),
+                      "Lihat Daftar Makanan & Minuman",
+                      style: TextStyle(color: textColor),
                     ),
-                    SizedBox(height: 10),
-                    GestureDetector(
-                      onTap: () {
-                        _showPCAndTimeSelection();
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: secondaryColor,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: greyTextColor,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Menampilkan pesanan makanan yang dipilih
+            Obx(() {
+              final orderedItems = _foodController.orderedItems;
+              if (orderedItems.isEmpty) return SizedBox.shrink();
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20),
+                  Text(
+                    "Pesanan Makanan & Minuman",
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: secondaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ...orderedItems.map(
+                          (item) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "PC ",
-                                  style: TextStyle(
-                                    color: textColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  "${item['name']} x${item['count']}",
+                                  style: TextStyle(color: textColor),
                                 ),
                                 Text(
-                                  "$selectedPC",
+                                  "Rp ${(item['price'] as int) * (item['count'] as int)}",
                                   style: TextStyle(
                                     color: textColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Opacity(
-                                  opacity: 0.7,
-                                  child: Text(
-                                    selectedTime,
-                                    style: TextStyle(
-                                      color: textColor,
-                                      fontSize: 14,
-                                    ),
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
                             ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                color: Colors.blue,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.keyboard_arrow_down,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    // Makanan & Minuman
-                    Text(
-                      "Makanan & Minuman",
-                      style: TextStyle(color: textColor, fontSize: 16),
-                    ),
-                    SizedBox(height: 10),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FoodBeveragePage(),
                           ),
-                        );
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 16,
                         ),
-                        decoration: BoxDecoration(
-                          color: secondaryColor,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
+                        Divider(color: greyTextColor),
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Makanan & Minuman",
+                              "Total F&B",
                               style: TextStyle(
                                 color: textColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Container(
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
+                            Text(
+                              "Rp ${_foodController.totalFoodPrice}",
+                              style: TextStyle(
                                 color: Colors.blue,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.arrow_forward_ios,
-                                color: Colors.white,
-                                size: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
-                      ),
+                      ],
                     ),
-                    SizedBox(height: 20),
-                    // Layanan Section
-                    Text(
-                      "Layanan",
-                      style: TextStyle(color: textColor, fontSize: 16),
+                  ),
+                ],
+              );
+            }),
+
+            SizedBox(height: 30),
+            Text(
+              "Riwayat Pemesanan",
+              style: TextStyle(
+                color: textColor,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: secondaryColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Obx(() {
+                if (_foodController.bookingHistory.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Belum ada riwayat pemesanan",
+                      style: TextStyle(color: greyTextColor),
                     ),
-                    SizedBox(height: 10),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        color: secondaryColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: Colors.blue.withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.person,
-                              color: Colors.blue,
-                              size: 20,
-                            ),
+                  );
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children:
+                      _foodController.bookingHistory.map((booking) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Text(
+                            "${booking['category']} - PC ${booking['pc']} - ${booking['duration']}",
+                            style: TextStyle(color: textColor),
                           ),
-                          SizedBox(width: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Michael",
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              Text(
-                                "michael@example.com",
-                                style: TextStyle(
-                                  color: greyTextColor,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Spacer(),
-                          Container(
-                            padding: EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.arrow_forward_ios,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    // Riwayat Pemesanan
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        color: secondaryColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Riwayat Pemesanan",
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.arrow_forward_ios,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 30),
-                    // Confirm Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: () {
-                          _showBookingConfirmation();
-                        },
-                        child: Text(
-                          "Konfirmasi Booking",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                        );
+                      }).toList(),
+                );
+              }),
+            ),
+            SizedBox(height: 30),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed:
+                    () => _showBookingConfirmation(textColor, greyTextColor),
+                child: Text(
+                  "Konfirmasi Booking",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  void _showPCAndTimeSelection() {
-    // Mengambil status tema
-    final box = GetStorage();
-    bool isDarkMode = box.read('isDarkMode') ?? true;
-
-    // Warna untuk bottom sheet berdasarkan tema dan pengaturan latar belakang putih
-    Color bottomSheetColor =
-        widget.isWhiteBackground
-            ? Colors.white
-            : (isDarkMode ? Color(0xFF111827) : Colors.white);
-    Color textColor =
-        widget.isWhiteBackground
-            ? Colors.black
-            : (isDarkMode ? Colors.white : Colors.black);
-    Color itemColor =
-        widget.isWhiteBackground
-            ? Color(0xFFEEEEEE)
-            : (isDarkMode ? Color(0xFF1F2937) : Colors.grey.shade200);
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Container(
-              height: 400,
-              decoration: BoxDecoration(
-                color: bottomSheetColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Pilih PC",
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children:
-                          availablePCs.map((pc) {
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  selectedPC = pc;
-                                });
-                              },
-                              child: Container(
-                                width: 60,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  color:
-                                      selectedPC == pc
-                                          ? Colors.blue
-                                          : itemColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "$pc",
-                                    style: TextStyle(
-                                      color:
-                                          selectedPC == pc
-                                              ? Colors.white
-                                              : textColor,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                    ),
-                    SizedBox(height: 24),
-                    Text(
-                      "Pilih Waktu",
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children:
-                          availableTimes.map((time) {
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  selectedTime = time;
-                                });
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color:
-                                      selectedTime == time
-                                          ? Colors.blue
-                                          : itemColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  time,
-                                  style: TextStyle(
-                                    color:
-                                        selectedTime == time
-                                            ? Colors.white
-                                            : textColor,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                    ),
-                    Spacer(),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          setState(() {
-                            // Update parent state
-                            this.setState(() {});
-                          });
-                        },
-                        child: Text(
-                          "Pilih",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _showBookingConfirmation() {
-    // Mengambil status tema
-    final box = GetStorage();
-    bool isDarkMode = box.read('isDarkMode') ?? true;
-
-    // Warna untuk dialog berdasarkan tema dan pengaturan latar belakang putih
-    Color dialogColor =
-        widget.isWhiteBackground
-            ? Colors.white
-            : (isDarkMode ? Color(0xFF111827) : Colors.white);
-    Color textColor =
-        widget.isWhiteBackground
-            ? Colors.black
-            : (isDarkMode ? Colors.white : Colors.black);
-    Color greyTextColor =
-        widget.isWhiteBackground ? Colors.grey.shade700 : Colors.grey;
+  void _showBookingConfirmation(Color textColor, Color greyTextColor) {
+    int pricePerHour = pcPrices[selectedCategory]!;
+    int hours = int.parse(selectedDuration.split(' ')[0]);
+    int pcTotal = pricePerHour * hours;
+    int foodTotal = _foodController.totalFoodPrice;
+    int grandTotal = pcTotal + foodTotal;
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: dialogColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            "Konfirmasi Booking",
-            style: TextStyle(
-              color: textColor,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          backgroundColor:
+              widget.isWhiteBackground ? Colors.white : Color(0xFF1F2937),
+          title: Text("Konfirmasi Booking", style: TextStyle(color: textColor)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _confirmationItem("PC", "$selectedPC", textColor, greyTextColor),
-              _confirmationItem(
-                "Waktu",
-                selectedTime,
+              _infoRow("Kategori", selectedCategory, textColor, greyTextColor),
+              _infoRow("PC", "$selectedPC", textColor, greyTextColor),
+              _infoRow("Durasi", selectedDuration, textColor, greyTextColor),
+              _infoRow("Biaya PC", "Rp $pcTotal", textColor, greyTextColor),
+
+              // Tampilkan detail makanan jika ada
+              if (_foodController.orderedItems.isNotEmpty) ...[
+                Divider(color: greyTextColor, height: 24),
+                Text(
+                  "Pesanan Makanan & Minuman:",
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                ..._foodController.orderedItems.map(
+                  (item) => _infoRow(
+                    "${item['name']} x${item['count']}",
+                    "Rp ${(item['price'] as int) * (item['count'] as int)}",
+                    textColor,
+                    greyTextColor,
+                  ),
+                ),
+                _infoRow(
+                  "Total F&B",
+                  "Rp $foodTotal",
+                  textColor,
+                  greyTextColor,
+                ),
+              ],
+
+              Divider(color: greyTextColor, height: 24),
+              _infoRow(
+                "TOTAL",
+                "Rp $grandTotal",
+                Colors.blue,
                 textColor,
-                greyTextColor,
-              ),
-              _confirmationItem(
-                "Tanggal",
-                "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
-                textColor,
-                greyTextColor,
-              ),
-              _confirmationItem("Total", "Rp 30.000", textColor, greyTextColor),
-              SizedBox(height: 16),
-              Text(
-                "Apakah data booking sudah benar?",
-                style: TextStyle(color: textColor, fontSize: 14),
+                isBold: true,
               ),
             ],
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
               child: Text("Batal", style: TextStyle(color: greyTextColor)),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
               onPressed: () {
+                // Tambahkan booking ke riwayat
+                _foodController.addBookingToHistory({
+                  'category': selectedCategory,
+                  'pc': selectedPC,
+                  'duration': selectedDuration,
+                  'pcTotal': pcTotal,
+                  'foodTotal': foodTotal,
+                  'grandTotal': grandTotal,
+                  'date':
+                      DateTime.now()
+                          .toString(), // Tambahkan timestamp untuk urutan
+                });
+
                 Navigator.pop(context);
+
+                // Reset pesanan makanan
+                _foodController.clearOrders();
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text("Booking berhasil!"),
@@ -628,24 +504,28 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  Widget _confirmationItem(
+  Widget _infoRow(
     String label,
     String value,
     Color textColor,
-    Color greyTextColor,
-  ) {
+    Color greyTextColor, {
+    bool isBold = false,
+  }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: greyTextColor, fontSize: 14)),
+          Text(
+            label,
+            style: TextStyle(color: isBold ? textColor : greyTextColor),
+          ),
           Text(
             value,
             style: TextStyle(
               color: textColor,
-              fontSize: 14,
               fontWeight: FontWeight.bold,
+              fontSize: isBold ? 16 : 14,
             ),
           ),
         ],

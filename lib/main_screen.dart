@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'login_screen.dart';
 import 'home_page.dart';
 import 'booking_page.dart';
 import 'service_page.dart';

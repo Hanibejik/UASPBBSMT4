@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zo_animated_border/zo_animated_border.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'game_service.dart';
 
 class ServicesPage extends StatefulWidget {
@@ -13,13 +14,48 @@ class ServicesPage extends StatefulWidget {
 }
 
 class _ServicesPageState extends State<ServicesPage> {
+  final List<Map<String, String>> lokasiWarnet = [
+    {
+      "nama": "Warnet Solo Net",
+      "alamat": "Jl. Slamet Riyadi No. 45, Solo",
+      "url":
+          "https://www.google.com/maps/search/?api=1&query=Jl.+Slamet+Riyadi+No.+45,+Solo",
+    },
+    {
+      "nama": "GigaNet Solo",
+      "alamat": "Jl. Adi Sucipto No. 12, Solo",
+      "url":
+          "https://www.google.com/maps/search/?api=1&query=Jl.+Adi+Sucipto+No.+12,+Solo",
+    },
+    {
+      "nama": "SpeedNet Gaming",
+      "alamat": "Jl. Veteran No. 10, Solo",
+      "url":
+          "https://www.google.com/maps/search/?api=1&query=Jl.+Veteran+No.+10,+Solo",
+    },
+    {
+      "nama": "ArenaNet Solo",
+      "alamat": "Jl. Dr. Radjiman No. 3, Solo",
+      "url":
+          "https://www.google.com/maps/search/?api=1&query=Jl.+Dr.+Radjiman+No.+3,+Solo",
+    },
+    {
+      "nama": "NetZone Solo",
+      "alamat": "Jl. Yos Sudarso No. 88, Solo",
+      "url":
+          "https://www.google.com/maps/search/?api=1&query=Jl.+Yos+Sudarso+No.+88,+Solo",
+    },
+  ];
+
   void showServiceDetail(String title, String content) {
     showDialog(
       context: context,
       builder:
           (_) => AlertDialog(
             backgroundColor:
-                widget.isWhiteBackground ? Colors.white : Color(0xFF1F2937),
+                widget.isWhiteBackground
+                    ? Colors.white
+                    : const Color(0xFF1F2937),
             title: Text(
               title,
               style: TextStyle(
@@ -36,129 +72,10 @@ class _ServicesPageState extends State<ServicesPage> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text("Tutup", style: TextStyle(color: Colors.blue)),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void showGameMenu() {
-    final List<Map<String, String>> games = [
-      {"nama": "Ayodance", "gambar": "assets/images/game/ayodance.jpg"},
-      {"nama": "Counter Strike 2", "gambar": "assets/images/game/cs.jpg"},
-      {"nama": "Dota 2", "gambar": "assets/images/game/dota.jpg"},
-      {"nama": "Epic Game", "gambar": "assets/images/game/epicgame.jpg"},
-      {"nama": "Steam", "gambar": "assets/images/game/steam.jpg"},
-      {"nama": "Lost Saga Origin", "gambar": "assets/images/game/ls.jpg"},
-      {"nama": "Pointblank", "gambar": "assets/images/game/pb.jpg"},
-      {"nama": "Roblox", "gambar": "assets/images/game/roblox.jpg"},
-      {"nama": "Valorant", "gambar": "assets/images/game/valo.jpg"},
-      {"nama": "Fortnite", "gambar": "assets/images/game/fn.jpg"},
-    ];
-
-    showDialog(
-      context: context,
-      builder:
-          (_) => AlertDialog(
-            backgroundColor:
-                widget.isWhiteBackground ? Colors.white : Color(0xFF1F2937),
-            title: Text(
-              "Daftar Game",
-              style: TextStyle(
-                color: widget.isWhiteBackground ? Colors.black : Colors.white,
-              ),
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                children: [
-                  ...games.map(
-                    (game) => ListTile(
-                      leading: Image.asset(
-                        game["gambar"]!,
-                        width: 36,
-                        height: 36,
-                        errorBuilder:
-                            (_, __, ___) =>
-                                Icon(Icons.videogame_asset, color: Colors.grey),
-                      ),
-                      title: Text(
-                        game["nama"]!,
-                        style: TextStyle(
-                          color:
-                              widget.isWhiteBackground
-                                  ? Colors.black87
-                                  : Colors.white70,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Divider(
-                    color:
-                        widget.isWhiteBackground
-                            ? Colors.black
-                            : Colors.white70,
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.add_circle_outline, color: Colors.blue),
-                    title: Text(
-                      "Tambah Game",
-                      style: TextStyle(
-                        color:
-                            widget.isWhiteBackground
-                                ? Colors.black
-                                : Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      showDialog(
-                        context: context,
-                        builder:
-                            (_) => AlertDialog(
-                              backgroundColor:
-                                  widget.isWhiteBackground
-                                      ? Colors.white
-                                      : Color(0xFF1F2937),
-                              title: Text(
-                                "Tambah Game",
-                                style: TextStyle(
-                                  color:
-                                      widget.isWhiteBackground
-                                          ? Colors.black
-                                          : Colors.white,
-                                ),
-                              ),
-                              content: Text(
-                                "Silakan ke operator warnet untuk menginstall game Anda.",
-                                style: TextStyle(
-                                  color:
-                                      widget.isWhiteBackground
-                                          ? Colors.black87
-                                          : Colors.white70,
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  child: Text(
-                                    "Tutup",
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                ),
-                              ],
-                            ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text("Tutup", style: TextStyle(color: Colors.blue)),
+                child: const Text(
+                  "Tutup",
+                  style: TextStyle(color: Colors.blue),
+                ),
               ),
             ],
           ),
@@ -176,7 +93,7 @@ class _ServicesPageState extends State<ServicesPage> {
         gapLength: 5,
         strokeWidth: 3,
         color: Colors.blue,
-        animationDuration: Duration(seconds: 4),
+        animationDuration: const Duration(seconds: 4),
         borderStyle: BorderStyleType.monochrome,
         child: Container(
           width: 150,
@@ -186,7 +103,7 @@ class _ServicesPageState extends State<ServicesPage> {
             color:
                 widget.isWhiteBackground
                     ? Colors.grey.shade100
-                    : Color(0xFF1F2937),
+                    : const Color(0xFF1F2937),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -197,7 +114,7 @@ class _ServicesPageState extends State<ServicesPage> {
                 size: 32,
                 color: widget.isWhiteBackground ? Colors.black : Colors.white,
               ),
-              SizedBox(height: 6),
+              const SizedBox(height: 6),
               Text(
                 title,
                 style: TextStyle(
@@ -210,6 +127,33 @@ class _ServicesPageState extends State<ServicesPage> {
         ),
       ),
     );
+  }
+
+  Future<void> launchUrlExternal(String url) async {
+    try {
+      final encodedUrl = Uri.encodeFull(url);
+      final Uri uri = Uri.parse(encodedUrl);
+
+      debugPrint("Mencoba buka URL: $encodedUrl");
+
+      final can = await canLaunchUrl(uri);
+      debugPrint("Hasil canLaunchUrl: $can");
+
+      if (can) {
+        final success = await launchUrl(uri, mode: LaunchMode.platformDefault);
+        debugPrint("Hasil launchUrl: $success");
+      } else {
+        debugPrint('GAGAL buka: $uri');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tidak dapat membuka Google Maps')),
+        );
+      }
+    } catch (e) {
+      debugPrint('EXCEPTION saat membuka URL: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Terjadi kesalahan saat membuka Maps')),
+      );
+    }
   }
 
   @override
@@ -234,43 +178,96 @@ class _ServicesPageState extends State<ServicesPage> {
                 fontSize: 20,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Expanded(
-              child: Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  serviceBox("WiFi", Icons.wifi, () {
-                    showServiceDetail(
-                      "WiFi Warnet",
-                      "ID: warnet_wifi\nPassword: 12345678",
-                    );
-                  }),
-                  serviceBox("Layanan Game", Icons.videogame_asset, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (_) => GameServicePage(
-                              isWhiteBackground: widget.isWhiteBackground,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        serviceBox("WiFi", Icons.wifi, () {
+                          showServiceDetail(
+                            "WiFi Warnet",
+                            "ID: warnet_wifi\nPassword: 12345678",
+                          );
+                        }),
+                        serviceBox("Layanan Game", Icons.videogame_asset, () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => GameServicePage(
+                                    isWhiteBackground: widget.isWhiteBackground,
+                                  ),
                             ),
+                          );
+                        }),
+                        serviceBox("Charge", Icons.battery_charging_full, () {
+                          showServiceDetail(
+                            "Layanan Charge",
+                            "Harga: Rp 2.000 / jam\nSilakan lakukan transaksi di kasir.",
+                          );
+                        }),
+                        serviceBox("Stream Support", Icons.stream, () {
+                          showServiceDetail(
+                            "Stream Support",
+                            "Fasilitas tambahan:\n- Webcam HD\n- Microphone Eksternal\n- Screen Recorder\nHarga: Rp 8.000 / jam\nSilakan lakukan transaksi di kasir.",
+                          );
+                        }),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      "Lokasi Warnet",
+                      style: TextStyle(
+                        color:
+                            widget.isWhiteBackground
+                                ? Colors.black
+                                : Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
-                    );
-                  }),
-
-                  serviceBox("Charge", Icons.battery_charging_full, () {
-                    showServiceDetail(
-                      "Layanan Charge",
-                      "Harga: Rp 2.000 / jam\nSilakan lakukan transaksi di kasir.",
-                    );
-                  }),
-                  serviceBox("Stream Support", Icons.stream, () {
-                    showServiceDetail(
-                      "Stream Support",
-                      "Fasilitas tambahan:\n- Webcam HD\n- Microphone Eksternal\n- Screen Recorder\nHarga: Rp 8.000 / jam\nSilakan lakukan transaksi di kasir.",
-                    );
-                  }),
-                ],
+                    ),
+                    const SizedBox(height: 12),
+                    ...lokasiWarnet.map((lokasi) {
+                      return Card(
+                        color:
+                            widget.isWhiteBackground
+                                ? Colors.white
+                                : const Color(0xFF1F2937),
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.location_on,
+                            color: Colors.blue,
+                          ),
+                          title: Text(
+                            lokasi["nama"]!,
+                            style: TextStyle(
+                              color:
+                                  widget.isWhiteBackground
+                                      ? Colors.black
+                                      : Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          subtitle: Text(
+                            lokasi["alamat"]!,
+                            style: TextStyle(
+                              color:
+                                  widget.isWhiteBackground
+                                      ? Colors.black54
+                                      : Colors.white70,
+                            ),
+                          ),
+                          onTap: () => launchUrlExternal(lokasi["url"] ?? ""),
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                ),
               ),
             ),
           ],

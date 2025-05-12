@@ -88,10 +88,18 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: isDarkMode ? Color(0xFF111827) : Colors.blue,
+        backgroundColor:
+            _isWhiteBackground
+                ? Colors.white
+                : (isDarkMode ? const Color(0xFF111827) : Colors.blue),
         title: Text(
           'Cafe & Warnet Solution',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: _isWhiteBackground ? Colors.black : Colors.white,
+          ),
+        ),
+        iconTheme: IconThemeData(
+          color: _isWhiteBackground ? Colors.black : Colors.white,
         ),
         actions: [
           IconButton(
@@ -99,13 +107,14 @@ class _MainScreenState extends State<MainScreen> {
               _isWhiteBackground
                   ? Icons.invert_colors_off
                   : Icons.invert_colors,
-              color: Colors.white,
+              color: _isWhiteBackground ? Colors.black : Colors.white,
             ),
             onPressed: _toggleBackground,
             tooltip: 'Ganti Background',
           ),
         ],
       ),
+
       body: _pages[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(

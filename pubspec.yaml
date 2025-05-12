@@ -21,7 +21,8 @@ dependencies:
   motion_tab_bar: ^2.0.4
   zo_animated_border : any
   flutter_image_slideshow: any
-  
+  url_launcher: ^6.1.10
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

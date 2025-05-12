@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/splash_screen.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'login_screen.dart';
@@ -172,7 +173,7 @@ class ProfileScreen extends StatelessWidget {
 
                         // Direct navigation to login screen without splash
                         Get.offAll(
-                          () => LoginScreen(onToggleTheme: onToggleTheme),
+                          () => SplashScreen(onToggleTheme: onToggleTheme),
                         );
                       },
                       child: Padding(

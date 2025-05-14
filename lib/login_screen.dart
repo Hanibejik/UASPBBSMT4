@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'main_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -24,7 +25,6 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   void initState() {
     super.initState();
-    // Load background preference
     final box = GetStorage();
     _isWhiteBackground = box.read('isWhiteBackground') ?? false;
 
@@ -47,10 +47,13 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void _processLogin() {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    final emailOrId = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (emailOrId.isEmpty || password.isEmpty) {
       Get.snackbar(
         'Error',
-        'Email dan password tidak boleh kosong',
+        'Email/ID dan password tidak boleh kosong',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -59,12 +62,32 @@ class _LoginScreenState extends State<LoginScreen>
     }
 
     final box = GetStorage();
-    box.write('username', _emailController.text);
-    box.write('password', _passwordController.text);
+    final registeredEmail = box.read('userEmail');
+    final registeredUserId = box.read('userId');
+    final registeredPassword = box.read('password');
+
+    final isValidUser =
+        (emailOrId == registeredEmail || emailOrId == registeredUserId);
+    final isValidPassword = password == registeredPassword;
+
+    if (!isValidUser || !isValidPassword) {
+      Get.snackbar(
+        'Login Gagal',
+        'Email/ID atau password salah atau belum terdaftar',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    // Simpan sesi login
+    box.write('username', registeredUserId);
+    box.write('loggedInEmail', registeredEmail);
 
     Get.offAll(
       () => MainScreen(
-        username: _emailController.text,
+        username: registeredUserId,
         onToggleTheme: widget.onToggleTheme,
       ),
     );
@@ -72,7 +95,6 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Reload background preference in case it changed
     final box = GetStorage();
     _isWhiteBackground = box.read('isWhiteBackground') ?? false;
     bool isDarkMode = box.read('isDarkMode') ?? true;
@@ -82,19 +104,14 @@ class _LoginScreenState extends State<LoginScreen>
           _isWhiteBackground
               ? Colors.white
               : (isDarkMode ? Colors.black : Colors.white),
-      // Menghilangkan AppBar yang berisi tombol ganti tema
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Menambahkan SafeArea untuk menggantikan AppBar
                 SizedBox(height: MediaQuery.of(context).padding.top + 20),
-
-                // Logo with animation
                 TweenAnimationBuilder(
                   tween: Tween<double>(begin: 0, end: 1),
                   duration: Duration(seconds: 1),
@@ -109,12 +126,7 @@ class _LoginScreenState extends State<LoginScreen>
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color:
-                                  _isWhiteBackground
-                                      ? Colors.blue.withOpacity(0.5)
-                                      : (isDarkMode
-                                          ? Colors.blue.withOpacity(0.3)
-                                          : Colors.blue.withOpacity(0.5)),
+                              color: Colors.blue.withOpacity(0.4),
                               blurRadius: 20,
                               spreadRadius: 5,
                             ),
@@ -128,9 +140,9 @@ class _LoginScreenState extends State<LoginScreen>
                               return Container(
                                 color: Colors.blue,
                                 child: Icon(
-                                  Icons.wifi_tethering,
-                                  size: 60,
+                                  Icons.wifi,
                                   color: Colors.white,
+                                  size: 50,
                                 ),
                               );
                             },
@@ -140,7 +152,6 @@ class _LoginScreenState extends State<LoginScreen>
                     );
                   },
                 ),
-
                 Text(
                   "CAFE & WARNET SOLUTION",
                   style: TextStyle(
@@ -149,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen>
                     color: Colors.blue,
                   ),
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 10),
                 Text(
                   "Internet dan Cafe Terbaik SeSolo Raya",
                   style: TextStyle(
@@ -162,8 +173,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 : Colors.grey[700]),
                   ),
                 ),
-                SizedBox(height: 50),
-
+                SizedBox(height: 40),
                 Text(
                   "LOGIN",
                   style: TextStyle(
@@ -176,240 +186,99 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                 ),
                 SizedBox(height: 30),
-
-                // Email field with animation
-                SlideTransition(
-                  position: Tween<Offset>(
-                    begin: Offset(-0.2, 0),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: _animationController,
-                      curve: Interval(0.2, 0.6, curve: Curves.easeOut),
-                    ),
+                TextField(
+                  controller: _emailController,
+                  style: TextStyle(
+                    color:
+                        _isWhiteBackground
+                            ? Colors.black
+                            : (isDarkMode ? Colors.white : Colors.black),
                   ),
-                  child: TextField(
-                    controller: _emailController,
-                    style: TextStyle(
-                      color:
-                          _isWhiteBackground
-                              ? Colors.black
-                              : (isDarkMode ? Colors.white : Colors.black),
-                    ),
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      labelStyle: TextStyle(
-                        color:
-                            _isWhiteBackground
-                                ? Colors.grey[700]
-                                : (isDarkMode ? Colors.grey : Colors.grey[700]),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(color: Colors.blue),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(
-                          color:
-                              _isWhiteBackground
-                                  ? Colors.grey.shade300
-                                  : (isDarkMode
-                                      ? Colors.grey.shade800
-                                      : Colors.grey.shade300),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(color: Colors.blue, width: 2),
-                      ),
-                      prefixIcon: Icon(Icons.email, color: Colors.blue),
-                      filled: true,
-                      fillColor:
-                          _isWhiteBackground
-                              ? Colors.grey.shade50
-                              : (isDarkMode
-                                  ? Colors.grey.shade900
-                                  : Colors.grey.shade50),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Password field with animation
-                SlideTransition(
-                  position: Tween<Offset>(
-                    begin: Offset(0.2, 0),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: _animationController,
-                      curve: Interval(0.4, 0.8, curve: Curves.easeOut),
-                    ),
-                  ),
-                  child: TextField(
-                    controller: _passwordController,
-                    obscureText: !_isPasswordVisible,
-                    style: TextStyle(
-                      color:
-                          _isWhiteBackground
-                              ? Colors.black
-                              : (isDarkMode ? Colors.white : Colors.black),
-                    ),
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      labelStyle: TextStyle(
-                        color:
-                            _isWhiteBackground
-                                ? Colors.grey[700]
-                                : (isDarkMode ? Colors.grey : Colors.grey[700]),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(color: Colors.blue),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(
-                          color:
-                              _isWhiteBackground
-                                  ? Colors.grey.shade300
-                                  : (isDarkMode
-                                      ? Colors.grey.shade800
-                                      : Colors.grey.shade300),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(color: Colors.blue, width: 2),
-                      ),
-                      prefixIcon: Icon(Icons.lock, color: Colors.blue),
-                      filled: true,
-                      fillColor:
-                          _isWhiteBackground
-                              ? Colors.grey.shade50
-                              : (isDarkMode
-                                  ? Colors.grey.shade900
-                                  : Colors.grey.shade50),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color:
-                              _isWhiteBackground
-                                  ? Colors.grey[700]
-                                  : (isDarkMode
-                                      ? Colors.grey
-                                      : Colors.grey[700]),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      Get.snackbar(
-                        'Info',
-                        'Fitur lupa password akan segera tersedia',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.blue,
-                        colorText: Colors.white,
-                      );
-                    },
-                    child: Text(
-                      "Lupa Password?",
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-
-                // Login button with animation
-                SlideTransition(
-                  position: Tween<Offset>(
-                    begin: Offset(0, 0.2),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: _animationController,
-                      curve: Interval(0.6, 1.0, curve: Curves.easeOut),
-                    ),
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 55),
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      elevation: 5,
-                      shadowColor: Colors.blue.withOpacity(0.5),
-                    ),
-                    onPressed: _processLogin,
-                    child: Text(
-                      "Masuk",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Signup button with animation
-                SlideTransition(
-                  position: Tween<Offset>(
-                    begin: Offset(0, 0.4),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: _animationController,
-                      curve: Interval(0.7, 1.0, curve: Curves.easeOut),
-                    ),
-                  ),
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 55),
-                      side: BorderSide(color: Colors.blue, width: 1.5),
-                      foregroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    onPressed: () {
-                      Get.snackbar(
-                        'Info',
-                        'Fitur Daftar akan segera tersedia',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.blue,
-                        colorText: Colors.white,
-                      );
-                    },
-                    child: const Text(
-                      'Daftar',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  decoration: InputDecoration(
+                    labelText: 'Email atau ID Pengguna',
+                    prefixIcon: Icon(Icons.email, color: Colors.blue),
+                    filled: true,
+                    fillColor:
+                        _isWhiteBackground
+                            ? Colors.grey.shade100
+                            : (isDarkMode
+                                ? Colors.grey.shade900
+                                : Colors.grey.shade100),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
                     ),
                   ),
                 ),
                 SizedBox(height: 20),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: !_isPasswordVisible,
+                  style: TextStyle(
+                    color:
+                        _isWhiteBackground
+                            ? Colors.black
+                            : (isDarkMode ? Colors.white : Colors.black),
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: Icon(Icons.lock, color: Colors.blue),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isPasswordVisible
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    ),
+                    filled: true,
+                    fillColor:
+                        _isWhiteBackground
+                            ? Colors.grey.shade100
+                            : (isDarkMode
+                                ? Colors.grey.shade900
+                                : Colors.grey.shade100),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 30),
+                ElevatedButton(
+                  onPressed: _processLogin,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: Text("Masuk", style: TextStyle(fontSize: 18)),
+                ),
+                SizedBox(height: 20),
+                OutlinedButton(
+                  onPressed: () {
+                    Get.to(
+                      () => RegisterScreen(onToggleTheme: widget.onToggleTheme),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50),
+                    side: BorderSide(color: Colors.blue),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: Text(
+                    "Daftar",
+                    style: TextStyle(fontSize: 16, color: Colors.blue),
+                  ),
+                ),
               ],
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:zo_animated_border/zo_animated_border.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,7 +18,7 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor:
-              widget.isWhiteBackground ? Colors.white : Color(0xFF1F2937),
+              widget.isWhiteBackground ? Colors.white : const Color(0xFF1F2937),
           title: Text(
             title,
             style: TextStyle(
@@ -25,29 +26,27 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           content: SingleChildScrollView(
-            // Added scrolling here too
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(spec, style: TextStyle(color: Colors.grey, fontSize: 14)),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   price,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.blue,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   "Fitur tambahan:\n"
-                  "- Reguler: Ideal untuk gaming ringan dan pekerjaan sehari-hari. Cocok untuk pengguna yang membutuhkan performa solid dengan harga terjangkau.\n"
-                  "- VIP: Dirancang untuk pengalaman gaming yang lebih mulus dan grafis yang lebih tajam. Cocok untuk game AAA dan multitasking.\n"
-                  "- VVIP: Performance top-tier untuk gaming kelas berat, video editing, dan pekerjaan intensif lainnya. Monitor curved memberikan kenyamanan visual lebih.\n"
-                  "- Battle Arena: Dilengkapi dengan 2 private rooms yang masing-masing bisa menampung 5 PC, cocok untuk permainan kompetitif dan turnamen. Pengalaman gaming tanpa gangguan dengan perangkat premium.",
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                  "- Reguler: Ideal untuk gaming ringan dan pekerjaan sehari-hari.\n"
+                  "- VIP: Pengalaman gaming lebih smooth dan grafis tajam.\n"
+                  "- VVIP: Untuk game berat, editing, multitasking premium.\n"
+                  "- Battle Arena: 2 private room (masing-masing 5 PC), cocok turnamen.",
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
                 ),
               ],
             ),
@@ -55,7 +54,7 @@ class _HomePageState extends State<HomePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text("Tutup", style: TextStyle(color: Colors.red)),
+              child: const Text("Tutup", style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -65,90 +64,91 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final box = GetStorage();
+    final bool promoActive = box.read('promoActive') ?? false;
+
     return Scaffold(
       backgroundColor: widget.isWhiteBackground ? Colors.white : Colors.black,
       body: SafeArea(
-        // Added SafeArea for better layout
         child: SingleChildScrollView(
-          // Make the main content scrollable
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Kategori PC",
-                  style: TextStyle(
-                    color:
-                        widget.isWhiteBackground ? Colors.black : Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Kategori PC",
+                style: TextStyle(
+                  color: widget.isWhiteBackground ? Colors.black : Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-                SizedBox(height: 10),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    pcCategoryBox(
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  pcCategoryBox(
+                    "Reguler",
+                    Icons.computer,
+                    () => showPCDetail(
                       "Reguler",
-                      Icons.computer,
-                      () => showPCDetail(
-                        "Reguler",
-                        "Processor: Intel Core i5-10400\n"
-                            "GPU: NVIDIA GTX 1650\n"
-                            "RAM: 16GB DDR4\n"
-                            "Monitor: 24\" 144Hz\n"
-                            "Storage: SSD 256GB\n"
-                            "Harga: Rp5.000 / jam\n",
-                        "Rp5.000 / jam",
-                      ),
+                      "Processor: Intel Core i5-10400\n"
+                          "GPU: NVIDIA GTX 1650\n"
+                          "RAM: 16GB DDR4\n"
+                          "Monitor: 24\" 144Hz\n"
+                          "Storage: SSD 256GB\n"
+                          "Harga: Rp5.000 / jam\n",
+                      "Rp5.000 / jam",
                     ),
-                    pcCategoryBox(
+                  ),
+                  pcCategoryBox(
+                    "VIP",
+                    Icons.star,
+                    () => showPCDetail(
                       "VIP",
-                      Icons.star,
-                      () => showPCDetail(
-                        "VIP",
-                        "Processor: Intel Core i5-12400F\n"
-                            "GPU: NVIDIA RTX 2060\n"
-                            "RAM: 16GB DDR4\n"
-                            "Monitor: 27\" 180Hz\n"
-                            "Storage: SSD 512GB\n"
-                            "Harga: Rp7.000 / jam\n",
-                        "Rp7.000 / jam",
-                      ),
+                      "Processor: Intel Core i5-12400F\n"
+                          "GPU: NVIDIA RTX 2060\n"
+                          "RAM: 16GB DDR4\n"
+                          "Monitor: 27\" 180Hz\n"
+                          "Storage: SSD 512GB\n"
+                          "Harga: Rp7.000 / jam\n",
+                      "Rp7.000 / jam",
                     ),
-                    pcCategoryBox(
+                  ),
+                  pcCategoryBox(
+                    "VVIP",
+                    Icons.workspace_premium,
+                    () => showPCDetail(
                       "VVIP",
-                      Icons.workspace_premium,
-                      () => showPCDetail(
-                        "VVIP",
-                        "Processor: Intel Core i7-12700KF\n"
-                            "GPU: NVIDIA RTX 3070\n"
-                            "RAM: 32GB DDR4\n"
-                            "Monitor: 27\" 240Hz Curved\n"
-                            "Storage: SSD 1TB NVMe\n"
-                            "Harga: Rp10.000 / jam\n",
-                        "Rp10.000 / jam",
-                      ),
+                      "Processor: Intel Core i7-12700KF\n"
+                          "GPU: NVIDIA RTX 3070\n"
+                          "RAM: 32GB DDR4\n"
+                          "Monitor: 27\" 240Hz Curved\n"
+                          "Storage: SSD 1TB NVMe\n"
+                          "Harga: Rp10.000 / jam\n",
+                      "Rp10.000 / jam",
                     ),
-                    pcCategoryBox(
+                  ),
+                  pcCategoryBox(
+                    "Battle Arena",
+                    Icons.sports_esports,
+                    () => showPCDetail(
                       "Battle Arena",
-                      Icons.sports_esports,
-                      () => showPCDetail(
-                        "Battle Arena",
-                        "Processor: AMD Ryzen 7 5800X\n"
-                            "GPU: NVIDIA RTX 4060\n"
-                            "RAM: 32GB DDR4\n"
-                            "Monitor: 32\" 240Hz Curved Premium\n"
-                            "Storage: SSD 1TB NVMe\n"
-                            "Harga: Rp15.000 / jam\n",
-                        "Rp15.000 / jam",
-                      ),
+                      "Processor: AMD Ryzen 7 5800X\n"
+                          "GPU: NVIDIA RTX 4060\n"
+                          "RAM: 32GB DDR4\n"
+                          "Monitor: 32\" 240Hz Curved Premium\n"
+                          "Storage: SSD 1TB NVMe\n"
+                          "Harga: Rp15.000 / jam\n",
+                      "Rp15.000 / jam",
                     ),
-                  ],
-                ),
-                SizedBox(height: 30),
+                  ),
+                ],
+              ),
+
+              if (promoActive) ...[
+                const SizedBox(height: 30),
                 Text(
                   "Paket Malam",
                   style: TextStyle(
@@ -158,8 +158,7 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
-                // Remove the Expanded widget here
+                const SizedBox(height: 10),
                 Column(
                   children: [
                     nightPackageTile("Reguler", "Rp15.000"),
@@ -169,7 +168,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ],
-            ),
+            ],
           ),
         ),
       ),
@@ -187,7 +186,7 @@ class _HomePageState extends State<HomePage> {
         gapLength: 5,
         strokeWidth: 3,
         color: Colors.blue,
-        animationDuration: Duration(seconds: 4),
+        animationDuration: const Duration(seconds: 4),
         borderStyle: BorderStyleType.monochrome,
         child: Container(
           width: 150,
@@ -197,7 +196,7 @@ class _HomePageState extends State<HomePage> {
             color:
                 widget.isWhiteBackground
                     ? Colors.grey.shade100
-                    : Color(0xFF1F2937),
+                    : const Color(0xFF1F2937),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -208,7 +207,7 @@ class _HomePageState extends State<HomePage> {
                 size: 32,
                 color: widget.isWhiteBackground ? Colors.black : Colors.white,
               ),
-              SizedBox(height: 6),
+              const SizedBox(height: 6),
               Text(
                 title,
                 style: TextStyle(
@@ -226,8 +225,8 @@ class _HomePageState extends State<HomePage> {
   Widget nightPackageTile(String title, String price) {
     return Container(
       width: double.infinity,
-      margin: EdgeInsets.only(bottom: 10),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors:
@@ -242,7 +241,7 @@ class _HomePageState extends State<HomePage> {
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
             blurRadius: 8,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -257,7 +256,7 @@ class _HomePageState extends State<HomePage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           Text(
             "Paket malam untuk kategori $title.",
             style: TextStyle(

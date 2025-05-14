@@ -10,6 +10,8 @@ void main() async {
   await GetStorage.init();
 
   final box = GetStorage();
+  box.write('balance', 100000); // ✅ Simulasi saldo Rp 100.000
+
   bool isLoggedIn = box.read('username') != null;
   bool justLoggedOut = box.read('justLoggedOut') == true;
 

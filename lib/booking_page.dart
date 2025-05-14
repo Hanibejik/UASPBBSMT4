@@ -390,8 +390,30 @@ class _BookingPageState extends State<BookingPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed:
-                    () => _showBookingConfirmation(textColor, greyTextColor),
+                onPressed: () {
+                  final box = GetStorage();
+                  int currentBalance = box.read('balance') ?? 0;
+
+                  int pricePerHour = pcPrices[selectedCategory]!;
+                  int hours = int.parse(selectedDuration.split(' ')[0]);
+                  int pcTotal = pricePerHour * hours;
+                  int foodTotal = _foodController.totalFoodPrice;
+                  int grandTotal = pcTotal + foodTotal;
+
+                  if (currentBalance < grandTotal) {
+                    Get.snackbar(
+                      'Saldo Tidak Cukup',
+                      'Saldo kamu tidak mencukupi untuk booking ini. Silakan top-up terlebih dahulu.',
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                    return;
+                  }
+
+                  _showBookingConfirmation(textColor, greyTextColor);
+                },
+
                 child: Text(
                   "Konfirmasi Booking",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -471,6 +493,13 @@ class _BookingPageState extends State<BookingPage> {
             ),
             ElevatedButton(
               onPressed: () {
+                final box = GetStorage();
+                int currentBalance = box.read('balance') ?? 0;
+                box.write(
+                  'balance',
+                  currentBalance - grandTotal,
+                ); // ✅ kurangi saldo
+
                 // Tambahkan booking ke riwayat
                 _foodController.addBookingToHistory({
                   'category': selectedCategory,
@@ -479,14 +508,11 @@ class _BookingPageState extends State<BookingPage> {
                   'pcTotal': pcTotal,
                   'foodTotal': foodTotal,
                   'grandTotal': grandTotal,
-                  'date':
-                      DateTime.now()
-                          .toString(), // Tambahkan timestamp untuk urutan
+                  'date': DateTime.now().toString(),
                 });
 
                 Navigator.pop(context);
 
-                // Reset pesanan makanan
                 _foodController.clearOrders();
 
                 ScaffoldMessenger.of(context).showSnackBar(

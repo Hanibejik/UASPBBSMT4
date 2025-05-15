@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'booking_page.dart'; // Import untuk FoodOrderController
 
 class FoodBeveragePage extends StatefulWidget {

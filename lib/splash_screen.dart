@@ -153,7 +153,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               SizedBox(height: 10),
               Text(
-                "Internet dan Cafe Terbaik SeSolo Raya",
+                "try the best internet cafe experience",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,

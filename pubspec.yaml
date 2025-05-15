@@ -22,7 +22,7 @@ dependencies:
   zo_animated_border : any
   flutter_image_slideshow: any
   url_launcher: ^6.1.10
-
+  just_audio: ^0.9.36
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -31,6 +31,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/audio/backsound.mp3
     - assets/images/udb.png
     #kopi
     - assets/images/kopi/americano.jpg

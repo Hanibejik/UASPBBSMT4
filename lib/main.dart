@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/just_audio.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'splash_screen.dart';
@@ -36,6 +37,14 @@ class _MyAppState extends State<MyApp> {
     final box = GetStorage();
     _themeMode =
         box.read('isDarkMode') ?? true ? ThemeMode.dark : ThemeMode.light;
+
+    AudioController.init(); // 🔊 Mulai backsound
+  }
+
+  @override
+  void dispose() {
+    AudioController.dispose(); // ✅ Panggil controller saat app ditutup
+    super.dispose();
   }
 
   void _toggleTheme() {

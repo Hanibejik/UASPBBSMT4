@@ -16,34 +16,34 @@ class ServicesPage extends StatefulWidget {
 class _ServicesPageState extends State<ServicesPage> {
   final List<Map<String, String>> lokasiWarnet = [
     {
-      "nama": "Warnet Solo Net",
-      "alamat": "Jl. Slamet Riyadi No. 45, Solo",
-      "url":
-          "https://www.google.com/maps/search/?api=1&query=Jl.+Slamet+Riyadi+No.+45,+Solo",
+      "nama": "Atmadeva Game Center",
+      "alamat":
+          "Jl. Tangkuban Perahu A No.5-6, Mojosongo, Kec. Jebres, Kota Surakarta, Jawa Tengah 57127",
+      "url": "https://maps.app.goo.gl/rCQWgVEsKgymCj6n8",
     },
     {
-      "nama": "GigaNet Solo",
-      "alamat": "Jl. Adi Sucipto No. 12, Solo",
-      "url":
-          "https://www.google.com/maps/search/?api=1&query=Jl.+Adi+Sucipto+No.+12,+Solo",
+      "nama": "Pacific Game Center",
+      "alamat":
+          "Jl. Garuda Mas 89, Ruko Gamersi 1 No.C, Kabupaten Sukoharjo, Jawa Tengah 57169",
+      "url": "https://maps.app.goo.gl/bkpJmusok5HmKwti6",
     },
     {
-      "nama": "SpeedNet Gaming",
-      "alamat": "Jl. Veteran No. 10, Solo",
-      "url":
-          "https://www.google.com/maps/search/?api=1&query=Jl.+Veteran+No.+10,+Solo",
+      "nama": "Pacific Game Center 2",
+      "alamat":
+          "Jl. Cemp. 1, Karangrejo, Karangrejo, Ngringo, Kec. Jaten, Kabupaten Karanganyar, Jawa Tengah 57731",
+      "url": "https://maps.app.goo.gl/nPrsiNNXRf6Vwyuy6",
     },
     {
-      "nama": "ArenaNet Solo",
-      "alamat": "Jl. Dr. Radjiman No. 3, Solo",
-      "url":
-          "https://www.google.com/maps/search/?api=1&query=Jl.+Dr.+Radjiman+No.+3,+Solo",
+      "nama": "Poseidon",
+      "alamat":
+          "Jl. Menteri Supeno, Manahan, Kec. Banjarsari, Kota Surakarta, Jawa Tengah 57139",
+      "url": "https://maps.app.goo.gl/9ChypXK5v5uahM259",
     },
     {
-      "nama": "NetZone Solo",
-      "alamat": "Jl. Yos Sudarso No. 88, Solo",
-      "url":
-          "https://www.google.com/maps/search/?api=1&query=Jl.+Yos+Sudarso+No.+88,+Solo",
+      "nama": "Freedom Game Center",
+      "alamat":
+          "Jl. Ir. Sutami No.54, Pucangsawit, Kec. Jebres, Kota Surakarta, Jawa Tengah 57125",
+      "url": "https://maps.app.goo.gl/uzUAdoTfCdUejE2o8",
     },
   ];
 
@@ -191,7 +191,7 @@ class _ServicesPageState extends State<ServicesPage> {
                         serviceBox("WiFi", Icons.wifi, () {
                           showServiceDetail(
                             "WiFi Warnet",
-                            "ID: warnet_wifi\nPassword: 12345678",
+                            "ID: tungtungtungsahur\nPassword: 123212321",
                           );
                         }),
                         serviceBox("Layanan Game", Icons.videogame_asset, () {
@@ -214,7 +214,7 @@ class _ServicesPageState extends State<ServicesPage> {
                         serviceBox("Stream Support", Icons.stream, () {
                           showServiceDetail(
                             "Stream Support",
-                            "Fasilitas tambahan:\n- Webcam HD\n- Microphone Eksternal\n- Screen Recorder\nHarga: Rp 8.000 / jam\nSilakan lakukan transaksi di kasir.",
+                            "Fasilitas tambahan:\n- Webcam HD\n- Microphone Eksternal\n- Screen Recorder\nHarga: Rp 4.000 / jam\nSilakan lakukan transaksi di kasir.",
                           );
                         }),
                       ],

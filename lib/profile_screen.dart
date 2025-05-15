@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/just_audio.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'splash_screen.dart';
@@ -103,13 +104,13 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Account Settings
-            _sectionTitle("Account Settings"),
+            _sectionTitle("Pengaturan Akun"),
             const SizedBox(height: 12),
 
             ProfileMenuItem(
               icon: Icons.account_balance_wallet,
               iconColor: Colors.green,
-              title: "Balance",
+              title: "Saldo",
               value: "Rp $balance",
               isWhiteBackground: isWhiteBackground,
             ),
@@ -119,7 +120,7 @@ class ProfileScreen extends StatelessWidget {
             ProfileMenuItem(
               icon: Icons.history,
               iconColor: Colors.orange,
-              title: "Transaction History",
+              title: "Histori Transaksi",
               hasNavigation: true,
               isWhiteBackground: isWhiteBackground,
             ),
@@ -138,11 +139,12 @@ class ProfileScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            _sectionTitle("Notification Settings"),
+            _sectionTitle("Notifikasi"),
             const SizedBox(height: 12),
+
             ToggleSettingItem(
               icon: Icons.local_offer,
-              title: "Promo Notifications",
+              title: "Notifikasi Promo",
               value: box.read('promoActive') ?? false, // default false
               isWhiteBackground: isWhiteBackground,
               onChanged: (val) {
@@ -151,6 +153,21 @@ class ProfileScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 24),
+
+            const SizedBox(height: 12),
+            ToggleSettingItem(
+              icon: Icons.music_note,
+              title: "Backsound",
+              value: AudioController.getMutedStatus() == false,
+              isWhiteBackground: isWhiteBackground,
+              onChanged: (val) {
+                if (val) {
+                  AudioController.unmute();
+                } else {
+                  AudioController.mute();
+                }
+              },
+            ),
 
             // Logout
             GestureDetector(
